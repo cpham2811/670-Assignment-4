@@ -1,22 +1,30 @@
 ---
-title: "index"
-author: "Cuong Pham Vu"
+title: "Assignment 4"
+author: "Lucas Fox, Cuong Pham Vu"
 date: "2/21/2022"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+[Annual Survey of Jails 2018](https://www.icpsr.umich.edu/web/NACJD/series/7/studies)
+
+```{r}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(haven)
+library(janitor)
 ```
 
 ## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+```{r}
+jail <- read_dta("37392-0001-Data.dta")
 
-```{r cars}
-summary(cars)
+jail <- jail %>%
+  janitor::clean_names()
+
+glimpse(jail)
 ```
 
 ## Including Plots
