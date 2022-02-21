@@ -1,12 +1,20 @@
 ---
-title: "index"
-author: "Lucas Fox"
+title: "Assignment 4"
+author: "Lucas Fox, Cuong Pham Vu"
 date: "2/21/2022"
 output: html_document
 ---
 
+[Annual Survey of Jails, 2018](https://www.icpsr.umich.edu/web/NACJD/series/7/studies)
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(haven)
+library(janitor)
+
+
 ```
 
 ## R Markdown
@@ -15,16 +23,59 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r cars}
-summary(cars)
+```{r}
+jail <- read_dta("37392-0001-Data.dta")
+
+jail <- jail %>%
+  janitor::clean_names()
+
+glimpse(jail)
 ```
 
-## Including Plots
+## Plot 1
 
 You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+ggplot(jail) +
+  geom_col(mapping = aes(x = state, y = totpop))
+
+jail %>%
+  mutate(region = case_when (
+    state == 20 | state == 21 | state == 22 | state == 30 | state == 31 | state == 33 | state == 39 ~ "Northeast",
+   state == 1 | state == 4 | state == 9 | state == 10 | state == 11 | state == 18 | state == 19 |
+   state == 25 | state == 34 | state == 41 | state == 43 | state == 47 | state == 49 ~ "Southeast", 
+  state == 14 | state == 15 | state == 16 | state == 17 | state == 23 | state == 24 | state == 26 |
+   state == 28 | state == 35 |state == 36 | state == 42 | state == 50 ~ "Midwest", 
+   state == 3 | state == 32 | state == 37 | state == 44 ~ "Southwest", 
+   state == 2 | state == 5 | state == 6 | state == 13 | state == 27 | state == 29 | state == 38 | 
+  state == 45 | state == 48 | state == 51 ~ "West")) %>%
+  group_by(region)%>%
+  mutate(totmale = sum(adultm), totfemale = sum(adultf))%>% 
+  mutate(propmale = totmale/totpop, propfemale = totfemale/totpop)%>%
+  ggplot() + 
+  geom_col(mapping = aes(x = region, y = totpop))
+
+  jail %>%
+  ggplot(mapping = aes(x = totpop, y = corrstaff))+ 
+  geom_point(alpha = .5) +
+  geom_smooth() + 
+  labs(
+    title = "Amount of Correctional Staff Increases as Prison Population Increases",
+    subtitle = "In the Year 2018",
+    caption = "Data adapted from Annual Survey of Jails 2018"
+  )
+  
+#mutate(race = case_when(
+ # black >= 1 ~"Black",
+  #white >= 1 ~ "White",
+  #asian >=1 ~ "Asian",
+ # hisp >= 1 ~ "Hispanic"
+#)#) %>%
+ # ggplot(mapping = aes(x = race , y = totpop)) +
+  #geom_col() +
+  #facet_wrap(region)
+
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
