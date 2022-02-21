@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(haven)
 library(janitor)
+library(srvyr)
 ```
 
 ## Assignment 4
@@ -24,15 +25,25 @@ jail <- read_dta("37392-0001-Data.dta")
 jail <- jail %>%
   janitor::clean_names()
 
-glimpse(jail)
+jail_svy <- jail %>% 
+  as_survey_design(weights = finalwt)
+
 ```
 
-## Including Plots
+## Plot 1
 
 You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+jail_svy %>%
+  group_by(state) %>%
+  mutate(totblack = sum(black),
+         statepop = sum(totpop),
+         totwhite = sum(white),
+         totadmis = sum(admis)) %>%
+  mutate(propblack = totblack/statepop) %>%
+  ggplot(mapping = aes(x = statepop, y = propblack, label = state)) +
+  geom_text()
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
