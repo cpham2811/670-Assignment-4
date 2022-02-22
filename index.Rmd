@@ -25,23 +25,12 @@ jail <- read_dta("37392-0001-Data.dta")
 jail <- jail %>%
   janitor::clean_names()
 
-jail_svy <- jail %>% 
-  as_survey_design(weights = finalwt)
-
 ```
 
-## Plot 1
+```{r, echo = FALSE}
 
-You can also embed plots, for example:
-
-```{r}
-jail %>%
-  group_by(state) %>%
-  mutate(totblack = sum(black),
-         statepop = sum(totpop),
-         totwhite = sum(white),
-         totadmis = sum(admis)) %>%
-  mutate(statenames = case_when(
+jail <- jail %>%
+   mutate(statenames = case_when(
     state == 1 ~ "AL",
     state == 3 ~ "AZ",
     state == 4 ~ "AR",
@@ -89,11 +78,91 @@ jail %>%
     state == 49 ~ "WV",
     state == 50 ~ "WI",
     state == 51 ~ "WY"
-  )) %>%
-  mutate(propblack = totblack/statepop) %>%
-  ggplot(mapping = aes(x = statepop, y = propblack, label = statenames)) +
-  geom_text(check_overlap = TRUE)
+  ))
 
+jail_svy <- jail %>% 
+  as_survey_design(weights = finalwt)
+
+jail_svy2 <- jail %>%
+  as_survey_design(weights = designwt)
+```
+
+## Plot 1
+
+```{r}
+jail_svy %>%
+  group_by(state) %>%
+  mutate(totblack = sum(black),
+         statepop = sum(totpop)) %>%
+  mutate(propblack = totblack/statepop) %>%
+  summarize(totblack = totblack,
+            statepop = statepop,
+            propblack = propblack,
+            statenames = statenames) %>%
+  ggplot(mapping = aes(x = statepop, y = propblack, label = statenames)) +
+  geom_text(check_overlap = TRUE, size = 3) +
+  geom_smooth(color = "light blue", se = FALSE) +
+  labs(title = "States with larger jail populations tend to jail more African Americans relatively",
+       x = "Total jail population in state",
+       y = "Proportion of jail population that is Black",
+       caption = "Data from Annual Surveys of Jails, 2018") +
+  theme_minimal()
+
+jail_svy %>%
+  group_by(state) %>%
+  summarize(prop = black/totpop,
+         statepop = survey_total(totpop),
+         propblack = survey_mean(prop),
+         statenames = statenames) %>%
+  ggplot(mapping = aes(x = statepop, y = propblack, label = statenames)) +
+  geom_text(check_overlap = TRUE, size = 3) +
+  geom_smooth(color = "light blue", se = FALSE) +
+  labs(title = "States with larger jail populations tend to jail more African Americans relatively",
+       x = "Total jail population in state",
+       y = "Proportion of jail population that is Black",
+       caption = "Data from Annual Survey of Jails, 2018") +
+  theme_minimal()
+
+jail_svy2 %>%
+  summarize(n = survey_total(totpop))
+
+```
+
+## Plot 2
+
+```{r}
+jail %>%
+  mutate(region = case_when (
+    state == 20 | state == 21 | state == 22 | state == 30 | state == 31 | state == 33 | state == 39 ~ "Northeast",
+   state == 1 | state == 4 | state == 9 | state == 10 | state == 11 | state == 18 | state == 19 |
+   state == 25 | state == 34 | state == 41 | state == 43 | state == 47 | state == 49 ~ "Southeast", 
+  state == 14 | state == 15 | state == 16 | state == 17 | state == 23 | state == 24 | state == 26 |
+   state == 28 | state == 35 |state == 36 | state == 42 | state == 50 ~ "Midwest", 
+   state == 3 | state == 32 | state == 37 | state == 44 ~ "Southwest", 
+   state == 2 | state == 5 | state == 6 | state == 13 | state == 27 | state == 29 | state == 38 | 
+  state == 45 | state == 48 | state == 51 ~ "West")) %>%
+  mutate(capacity = case_when(
+    rated > totpop ~ "Under capacity",
+    rated == totpop ~ "At capacity",
+    rated < totpop ~ "Over capacity"
+  )) %>%
+  ggplot() +
+  geom_bar(aes(x = capacity, fill = capacity)) +
+  facet_wrap("region") +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  labs(title = "Facility capacity by region",
+       y = "Number of facilities",
+       caption = "Data from Annual Survey of Prisons, 2018")
+
+  
+
+  ggplot(mapping = aes(x = rated, y = nconpop, color = capacity)) +
+  geom_point() +
+  scale_x_log10() +
+  scale_y_log10() +
+  facet_wrap("region")
 
 ```
 
