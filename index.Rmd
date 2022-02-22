@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(haven)
 library(janitor)
+library(srvyr)
 
 
 ```
@@ -30,6 +31,9 @@ jail <- jail %>%
   janitor::clean_names()
 
 glimpse(jail)
+
+jail_svy <- jail %>%
+  as_survey_design(weights = finalwt)
 ```
 
 ## Plot 1
@@ -40,7 +44,7 @@ You can also embed plots, for example:
 ggplot(jail) +
   geom_col(mapping = aes(x = state, y = totpop))
 
-jail %>%
+jail_svy %>%
   mutate(region = case_when (
     state == 20 | state == 21 | state == 22 | state == 30 | state == 31 | state == 33 | state == 39 ~ "Northeast",
    state == 1 | state == 4 | state == 9 | state == 10 | state == 11 | state == 18 | state == 19 |
@@ -51,10 +55,19 @@ jail %>%
    state == 2 | state == 5 | state == 6 | state == 13 | state == 27 | state == 29 | state == 38 | 
   state == 45 | state == 48 | state == 51 ~ "West")) %>%
   group_by(region)%>%
-  mutate(totmale = sum(adultm), totfemale = sum(adultf))%>% 
-  mutate(propmale = totmale/totpop, propfemale = totfemale/totpop)%>%
-  ggplot() + 
-  geom_col(mapping = aes(x = region, y = totpop))
+  summarize(region = region, totpop = survey_total(totpop))%>% 
+  ggplot() +
+  geom_bar(mapping = aes(x = region, weight = totpop, fill = region)) +
+  coord_flip() + 
+  scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
+  labs(
+    title = "Southeast Region of the United States Houses the Most Inmates per Region",
+    subtitle = "Compared to Northeast, Midwest, West, and Southwest",
+    caption = "Data adapted from Annual Survey of Jails 2018",
+    y ="Total Population",
+    x = ""
+  ) +
+  theme_minimal()
 
   jail %>%
   ggplot(mapping = aes(x = totpop, y = corrstaff))+ 
@@ -63,7 +76,7 @@ jail %>%
   labs(
     title = "Amount of Correctional Staff Increases as Prison Population Increases",
     subtitle = "In the Year 2018",
-    caption = "Data adapted from Annual Survey of Jails 2018"
+    caption = "Data adapted from Annual Survey of Jails 2018", 
   )
   
 #mutate(race = case_when(
@@ -75,7 +88,56 @@ jail %>%
  # ggplot(mapping = aes(x = race , y = totpop)) +
   #geom_col() +
   #facet_wrap(region)
+  
+jail %>%
+  mutate(overcrowded = if_else(totpop > rated, true = 1, false = 0)) %>%
+  ggplot()+
+  geom_point(mapping = aes(x = overcrowded, y = adp))
 
+jail%>%
+  group_by(state)%>%
+  mutate(propfelon = sum(felony)/sum(totoff))%>%
+  ggplot()+
+  geom_col(mapping = aes(x = state, y = propfelon ))
+
+jail%>%
+  group_by(state)%>%
+  mutate(propfelon = sum(felony)/sum(totoff))%>%
+  ggplot()+
+  geom_point(mapping = aes(x = totoff, y = propfelon ))
+
+jail%>%
+  group_by(state)%>%
+  mutate(propfem = sum(adultf)/sum(totpop))%>%
+  ggplot()+
+  geom_col(mapping = aes(x = state, y = propfem ))
+
+jail%>%
+  group_by(state)%>%
+  mutate(propconv = sum(conv)/sum(totpop))%>%
+  ggplot()+
+  geom_col(mapping = aes(x = state, y = propconv ))
+
+jail%>%
+  group_by(state)%>%
+  mutate(propunconv = sum(unconv)/sum(totpop))%>%
+  ggplot()+
+  geom_col(mapping = aes(x = state, y = propunconv ))
+
+
+jail%>%
+  group_by(state)%>%
+  mutate(totalice = sum(ice))%>%
+  ggplot()+
+  geom_point(mapping = aes(x = state, y = totalice))
+
+
+
+jail%>%
+  group_by(state)%>%
+  mutate(propice = sum(ice)/sum(totpop))%>%
+  ggplot()+
+  geom_point(mapping = aes(x = state, y = propice))
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
