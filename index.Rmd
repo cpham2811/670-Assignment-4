@@ -38,12 +38,7 @@ jail_svy <- jail %>%
 
 ## Plot 1
 
-You can also embed plots, for example:
-
 ```{r}
-ggplot(jail) +
-  geom_col(mapping = aes(x = state, y = totpop))
-
 jail_svy %>%
   mutate(region = case_when (
     state == 20 | state == 21 | state == 22 | state == 30 | state == 31 | state == 33 | state == 39 ~ "Northeast",
@@ -64,10 +59,18 @@ jail_svy %>%
     title = "Southeast Region of the United States Houses the Most Inmates per Region",
     subtitle = "Compared to Northeast, Midwest, West, and Southwest",
     caption = "Data adapted from Annual Survey of Jails 2018",
-    y ="Total Population",
+    y ="Total Number of Individuals in Jails",
     x = ""
   ) +
   theme_minimal()
+
+```
+## Other Ideas for Plots
+```{r}
+ggplot(jail) +
+  geom_col(mapping = aes(x = state, y = totpop))
+
+
 
   jail %>%
   ggplot(mapping = aes(x = totpop, y = corrstaff))+ 
