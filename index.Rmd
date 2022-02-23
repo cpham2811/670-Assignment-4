@@ -30,13 +30,142 @@ jail <- read_dta("37392-0001-Data.dta")
 jail <- jail %>%
   janitor::clean_names()
 
-glimpse(jail)
 
 jail_svy <- jail %>%
   as_survey_design(weights = finalwt)
 ```
+```{r, echo = FALSE}
+jail <- jail %>%
+   mutate(statenames = case_when(
+    state == 1 ~ "AL",
+    state == 3 ~ "AZ",
+    state == 4 ~ "AR",
+    state == 5 ~ "CA",
+    state == 6 ~ "CO",
+    state == 7 ~ "CT",
+    state == 8 ~ "DE",
+    state == 9 ~ "DC",
+    state == 10 ~ "FL",
+    state == 11 ~ "GA",
+    state == 13 ~ "ID",
+    state == 14 ~ "IL",
+    state == 15 ~ "IN",
+    state == 16 ~ "IA",
+    state == 17 ~ "KS",
+    state == 18 ~ "KY",
+    state == 19 ~ "LA",
+    state == 20 ~ "ME",
+    state == 21 ~ "MD",
+    state == 22 ~ "MA",
+    state == 23 ~ "MI",
+    state == 24 ~ "MN",
+    state == 25 ~ "MS",
+    state == 26 ~ "MO",
+    state == 27 ~ "MT",
+    state == 28 ~ "NE",
+    state == 29 ~ "NV",
+    state == 30 ~ "NH",
+    state == 31 ~ "NJ",
+    state == 32 ~ "NM",
+    state == 33 ~ "NY",
+    state == 34 ~ "NC",
+    state == 35 ~ "ND",
+    state == 36 ~ "OH",
+    state == 37  ~ "OK",
+    state == 38 ~ "OR",
+    state == 39 ~ "PA",
+    state == 41 ~ "SC",
+    state == 42 ~ "SD",
+    state == 43 ~ "TN",
+    state == 44 ~ "TX",
+    state == 45 ~ "UT",
+    state == 47 ~ "VA",
+    state == 48 ~ "WA",
+    state == 49 ~ "WV",
+    state == 50 ~ "WI",
+    state == 51 ~ "WY"
+  ))
+jail_svy <- jail %>% 
+  as_survey_design(weights = finalwt)
+jail_svy <- jail_svy %>%
+  mutate(region = case_when (
+    state == 20 | state == 21 | state == 22 | state == 30 | state == 31 | state == 33 | state == 39 ~ "Northeast",
+   state == 1 | state == 4 | state == 9 | state == 10 | state == 11 | state == 18 | state == 19 |
+   state == 25 | state == 34 | state == 41 | state == 43 | state == 47 | state == 49 ~ "Southeast", 
+  state == 14 | state == 15 | state == 16 | state == 17 | state == 23 | state == 24 | state == 26 |
+   state == 28 | state == 35 |state == 36 | state == 42 | state == 50 ~ "Midwest", 
+   state == 3 | state == 32 | state == 37 | state == 44 ~ "Southwest", 
+   state == 2 | state == 5 | state == 6 | state == 13 | state == 27 | state == 29 | state == 38 | 
+  state == 45 | state == 48 | state == 51 ~ "West"))
+```
 
 ## Plot 1
+
+```{r}
+jail_svy %>%
+  group_by(state) %>%
+  summarize(totblack = survey_total(black),
+         statepop = survey_total(totpop),
+         propblack = totblack/statepop,
+         statenames = statenames) %>%
+  ggplot(mapping = aes(x = statepop, y = propblack, label = statenames)) +
+  geom_text(check_overlap = TRUE, size = 3) +
+  geom_smooth(color = "light blue", se = FALSE) +
+  labs(title = "States with larger jail populations tend to jail more African Americans relatively",
+       x = "Total jail population in state",
+       y = "Proportion of jail population that is Black",
+       caption = "Data from Annual Survey of Jails, 2018") +
+  theme_minimal()
+```
+
+## Plot 2
+
+```{r}
+jail_svy %>%
+  mutate(capacity = case_when(
+    rated > totpop ~ "Under capacity",
+    rated == totpop ~ "At capacity",
+    rated < totpop ~ "Over capacity"
+  )) %>%
+  mutate(indic = 1) %>%
+  group_by(capacity, region) %>%
+  summarize(n = survey_total(indic)) %>%
+  ggplot() +
+  geom_col(aes(x = capacity, y = n, fill = capacity)) +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  facet_wrap("region") +
+  scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
+  labs(title = "Facility capacity by region",
+       subtitle = "Majority of facilities are under or over capacity",
+       y = "Number of facilities",
+       caption = "Data from Annual Survey of Jails, 2018")
+```
+
+## Plot 3
+
+```{r}
+jail_svy %>%
+  group_by(state) %>%
+  summarize(totnon = survey_total(noncitz),
+            totpop = survey_total(totpop),
+            statenames = statenames,
+            region = region,
+            totice = survey_total(ice),
+            propnoncit = totnon/totpop,
+            propice = totice/totpop) %>%
+  ggplot() +
+  geom_point(aes(x = propice, y = propnoncit), alpha = 0.5) +
+  geom_smooth(aes(x = propice, y = propnoncit), method = "lm", color = "light blue") +
+  theme_minimal() +
+  labs(title = "Relationship between share of non-citizens and share of ICE arrests",
+       x = "Share of population arrested by ICE",
+       y = "Share of population that are non-citizens",
+       subtitle = "Jails holding more non-citizens typically hold more inmates for ICE",
+       caption = "Data from Annual Survey of Jails, 2018")
+```
+## Plot 4
 
 ```{r}
 jail_svy %>%
@@ -56,91 +185,18 @@ jail_svy %>%
   coord_flip() + 
   scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
   labs(
-    title = "Southeast Region of the United States Houses the Most Inmates per Region",
+    title = "Southeast Region of the United States Houses the Most Inmates",
     subtitle = "Compared to Northeast, Midwest, West, and Southwest",
-    caption = "Data adapted from Annual Survey of Jails 2018",
+    caption = "Data from Annual Survey of Jails 2018",
     y ="Total Number of Individuals in Jails",
     x = ""
   ) +
   theme_minimal()
 
 ```
-## Other Ideas for Plots
-```{r}
-ggplot(jail) +
-  geom_col(mapping = aes(x = state, y = totpop))
 
+## Part 4  Written Interpretation
+Our first plot maps the disproportionate representation of Black individuals in the jailing system across the country. From our graph, there is a generally positive trend (excluding outliers) regarding to total state population who have been in jail throughout the year 2018 and the proportion of Black individuals within those state jails. The proportion of Black individuals throughout the U.S. population as a whole is 13.4%, while most states have greater than 20% black individuals housed in the jail system, including the jurisdiction of D.C., in which Black individuals make up nearly 80% of the jail inhabitants. This graph informs policy relevant topics because there has been increased focus on the disproportionate representation of Black individuals across the incarceration system in recent years, whether it is based on racial discrimination or lack of access to education and opportunities. In addition to the increased scrutiny about the racial disparities in the criminal justice system, there has also been growing concern about the overcrowding of State prison systems. Based on the data, we concluded that there many more jails under capacity throughout the United States than above capacity. It is important to note that the jail system is different than the prison system, with jails being county-wide and much smaller than state-wide prison systems. The highest number of overcrowded jail facilities are located in the Midwest and the Southeast, but all regions have more jails below capacity than jails above capacity. The next graph represents the proportion of non-citizens within the jail systems by state and the proportion of the population that was arrested by ICE. We can see a positive relationship between these two variables which is unsurprising, as we expect non-U.S.-citizens to be increasingly likely to be arrested by ICE, rather than another enforcement agency. This is policy relevant because certain states are increasingly averse to holding individuals arrested by ICE in their jail systems. States such as [New Jersey](https://documentedny.com/2021/11/18/there-are-no-immigrants-left-in-new-jersey-county-jails-heres-where-theyre-being-sent/) have recently broken their ties with ICE, and refuse to house individuals that have been arrested by ICE. Our fourth and final graph represents the total number of individuals in jails, broken down by region, and we can see that the Southeast of the United States houses the most inmates in their region. The Southeast houses almost as many individuals in their jail system as the rest of the United States combined. This is interesting from a policy persepctive to compare and contrast policing tactics or other reasons that the Southeast has so many individuals in jails compared to the rest of the United States, what is the Southeast doing differently? 
 
-
-  jail %>%
-  ggplot(mapping = aes(x = totpop, y = corrstaff))+ 
-  geom_point(alpha = .5) +
-  geom_smooth() + 
-  labs(
-    title = "Amount of Correctional Staff Increases as Prison Population Increases",
-    subtitle = "In the Year 2018",
-    caption = "Data adapted from Annual Survey of Jails 2018", 
-  )
-  
-#mutate(race = case_when(
- # black >= 1 ~"Black",
-  #white >= 1 ~ "White",
-  #asian >=1 ~ "Asian",
- # hisp >= 1 ~ "Hispanic"
-#)#) %>%
- # ggplot(mapping = aes(x = race , y = totpop)) +
-  #geom_col() +
-  #facet_wrap(region)
-  
-jail %>%
-  mutate(overcrowded = if_else(totpop > rated, true = 1, false = 0)) %>%
-  ggplot()+
-  geom_point(mapping = aes(x = overcrowded, y = adp))
-
-jail%>%
-  group_by(state)%>%
-  mutate(propfelon = sum(felony)/sum(totoff))%>%
-  ggplot()+
-  geom_col(mapping = aes(x = state, y = propfelon ))
-
-jail%>%
-  group_by(state)%>%
-  mutate(propfelon = sum(felony)/sum(totoff))%>%
-  ggplot()+
-  geom_point(mapping = aes(x = totoff, y = propfelon ))
-
-jail%>%
-  group_by(state)%>%
-  mutate(propfem = sum(adultf)/sum(totpop))%>%
-  ggplot()+
-  geom_col(mapping = aes(x = state, y = propfem ))
-
-jail%>%
-  group_by(state)%>%
-  mutate(propconv = sum(conv)/sum(totpop))%>%
-  ggplot()+
-  geom_col(mapping = aes(x = state, y = propconv ))
-
-jail%>%
-  group_by(state)%>%
-  mutate(propunconv = sum(unconv)/sum(totpop))%>%
-  ggplot()+
-  geom_col(mapping = aes(x = state, y = propunconv ))
-
-
-jail%>%
-  group_by(state)%>%
-  mutate(totalice = sum(ice))%>%
-  ggplot()+
-  geom_point(mapping = aes(x = state, y = totalice))
-
-
-
-jail%>%
-  group_by(state)%>%
-  mutate(propice = sum(ice)/sum(totpop))%>%
-  ggplot()+
-  geom_point(mapping = aes(x = state, y = propice))
-```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
