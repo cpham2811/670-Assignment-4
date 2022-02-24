@@ -14,6 +14,7 @@ library(tidyverse)
 library(haven)
 library(janitor)
 library(srvyr)
+library(scales)
 
 
 ```
@@ -197,11 +198,14 @@ jail_svy %>%
    state == 2 | state == 5 | state == 6 | state == 13 | state == 27 | state == 29 | state == 38 | 
   state == 45 | state == 48 | state == 51 ~ "West")) %>%
   group_by(region)%>%
-  summarize(region = region, totpop = survey_total(totpop))%>% 
+  summarize(region = region, totpop = survey_total(totpop, vartype = "ci"))%>% 
+  summarize(poptot = mean(totpop), ci_up = mean(totpop_upp), ci_low = mean(totpop_low))%>%
   ggplot() +
-  geom_bar(mapping = aes(x = region, weight = totpop, fill = region)) +
+  geom_bar(mapping = aes(x = region, weight = poptot, fill = region)) +
+  geom_errorbar(mapping = aes(x = region, ymin = ci_low, ymax = ci_up), width = .5) +
   coord_flip() + 
   scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
+  scale_y_continuous(label = comma) +
   labs(
     title = "Southeast Region of the United States Houses the Most Inmates",
     subtitle = "Compared to Northeast, Midwest, West, and Southwest",
@@ -214,7 +218,7 @@ jail_svy %>%
 ```
 
 ## Written Interpretation
-Our fourth and final graph represents the total number of individuals in jails, broken down by region, and we can see that the Southeast of the United States houses the most inmates in their region. The Southeast houses almost as many individuals in their jail system as the rest of the United States combined. This is interesting from a policy persepctive to compare and contrast policing tactics or other reasons that the Southeast has so many individuals in jails compared to the rest of the United States, what is the Southeast doing differently? 
+Our fourth and final graph represents the total number of individuals in jails, broken down by region, and we can see that the Southeast of the United States houses the most inmates in their region. The Southeast houses nearly 300,000 individuals which is about twice as many compared to any other region in the United States. Our graph includes our standard errors, which are needed because this is a survey estimate of individuals in jails, not administrative data. This is interesting from a policy persepctive to compare and contrast policing tactics or other reasons that the Southeast has so many individuals in jails compared to the rest of the United States, what is the Southeast doing differently? 
 
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
