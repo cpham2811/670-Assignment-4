@@ -118,6 +118,11 @@ jail_svy %>%
   theme_minimal()
 ```
 
+## Written Interpretation 
+Our first plot maps the disproportionate representation of Black individuals in the jailing system across the country. From our graph, there is a generally positive trend (excluding outliers) regarding to total state population who have been in jail throughout the year 2018 and the proportion of Black individuals within those state jails. The proportion of Black individuals throughout the U.S. population as a whole is 13.4%, while most states have greater than 20% black individuals housed in the jail system, including the jurisdiction of D.C., in which Black individuals make up nearly 80% of the jail inhabitants. This graph informs policy relevant topics because there has been increased focus on the disproportionate representation of Black individuals across the incarceration system in recent years, whether it is based on racial discrimination or lack of access to education and opportunities.
+
+
+
 ## Plot 2
 
 ```{r}
@@ -143,6 +148,12 @@ jail_svy %>%
        caption = "Data from Annual Survey of Jails, 2018")
 ```
 
+## Written Interpretation
+In addition to the increased scrutiny about the racial disparities in the criminal justice system, there has also been growing concern about the overcrowding of State prison systems. Based on the data, we concluded that there many more jails under capacity throughout the United States than above capacity. It is important to note that the jail system is different than the prison system, with jails being county-wide and much smaller than state-wide prison systems. The highest number of overcrowded jail facilities are located in the Midwest and the Southeast, but all regions have more jails below capacity than jails above capacity. 
+
+
+
+
 ## Plot 3
 
 ```{r}
@@ -165,6 +176,13 @@ jail_svy %>%
        subtitle = "Jails holding more non-citizens typically hold more inmates for ICE",
        caption = "Data from Annual Survey of Jails, 2018")
 ```
+
+
+## Written Interpretatation
+The next graph represents the proportion of non-citizens within the jail systems by state and the proportion of the population that was arrested by ICE. We can see a positive relationship between these two variables which is unsurprising, as we expect non-U.S.-citizens to be increasingly likely to be arrested by ICE, rather than another enforcement agency. This is policy relevant because certain states are increasingly averse to holding individuals arrested by ICE in their jail systems. States such as [New Jersey](https://documentedny.com/2021/11/18/there-are-no-immigrants-left-in-new-jersey-county-jails-heres-where-theyre-being-sent/) have recently broken their ties with ICE, and refuse to house individuals that have been arrested by ICE.
+
+
+
 ## Plot 4
 
 ```{r}
@@ -195,8 +213,8 @@ jail_svy %>%
 
 ```
 
-## Part 4  Written Interpretation
-Our first plot maps the disproportionate representation of Black individuals in the jailing system across the country. From our graph, there is a generally positive trend (excluding outliers) regarding to total state population who have been in jail throughout the year 2018 and the proportion of Black individuals within those state jails. The proportion of Black individuals throughout the U.S. population as a whole is 13.4%, while most states have greater than 20% black individuals housed in the jail system, including the jurisdiction of D.C., in which Black individuals make up nearly 80% of the jail inhabitants. This graph informs policy relevant topics because there has been increased focus on the disproportionate representation of Black individuals across the incarceration system in recent years, whether it is based on racial discrimination or lack of access to education and opportunities. In addition to the increased scrutiny about the racial disparities in the criminal justice system, there has also been growing concern about the overcrowding of State prison systems. Based on the data, we concluded that there many more jails under capacity throughout the United States than above capacity. It is important to note that the jail system is different than the prison system, with jails being county-wide and much smaller than state-wide prison systems. The highest number of overcrowded jail facilities are located in the Midwest and the Southeast, but all regions have more jails below capacity than jails above capacity. The next graph represents the proportion of non-citizens within the jail systems by state and the proportion of the population that was arrested by ICE. We can see a positive relationship between these two variables which is unsurprising, as we expect non-U.S.-citizens to be increasingly likely to be arrested by ICE, rather than another enforcement agency. This is policy relevant because certain states are increasingly averse to holding individuals arrested by ICE in their jail systems. States such as [New Jersey](https://documentedny.com/2021/11/18/there-are-no-immigrants-left-in-new-jersey-county-jails-heres-where-theyre-being-sent/) have recently broken their ties with ICE, and refuse to house individuals that have been arrested by ICE. Our fourth and final graph represents the total number of individuals in jails, broken down by region, and we can see that the Southeast of the United States houses the most inmates in their region. The Southeast houses almost as many individuals in their jail system as the rest of the United States combined. This is interesting from a policy persepctive to compare and contrast policing tactics or other reasons that the Southeast has so many individuals in jails compared to the rest of the United States, what is the Southeast doing differently? 
+## Written Interpretation
+Our fourth and final graph represents the total number of individuals in jails, broken down by region, and we can see that the Southeast of the United States houses the most inmates in their region. The Southeast houses almost as many individuals in their jail system as the rest of the United States combined. This is interesting from a policy persepctive to compare and contrast policing tactics or other reasons that the Southeast has so many individuals in jails compared to the rest of the United States, what is the Southeast doing differently? 
 
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
