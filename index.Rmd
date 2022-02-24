@@ -218,7 +218,7 @@ jail_svy %>%
 ```
 
 ## Written Interpretation
-Our fourth and final graph represents the total number of individuals in jails, broken down by region, and we can see that the Southeast of the United States houses the most inmates in their region. The Southeast houses nearly 300,000 individuals which is about twice as many compared to any other region in the United States. Our graph includes our standard errors, which are needed because this is a survey estimate of individuals in jails, not administrative data. This is interesting from a policy persepctive to compare and contrast policing tactics or other reasons that the Southeast has so many individuals in jails compared to the rest of the United States, what is the Southeast doing differently? 
+Our fourth and final graph represents the total number of individuals in jails, broken down by region, and we can see that the Southeast of the United States houses the most inmates in their region. The Southeast houses nearly 300,000 individuals which is about twice as many compared to any other region in the United States. Our graph includes our standard errors, which are needed because this is a survey estimate of individuals in jails, not administrative data. This is interesting from a policy persepctive to compare and contrast policing tactics or other reasons that the Southeast has so many individuals in jails compared to the rest of the United States, what is the Southeast doing differently?
 
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
