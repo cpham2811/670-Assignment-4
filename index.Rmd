@@ -1,11 +1,11 @@
 ---
 title: "Assignment 4"
 author: "Lucas Fox, Cuong Pham Vu"
-date: "2/21/2022"
+date: "2/24/2022"
 output: html_document
 ---
 
-[Annual Survey of Jails, 2018](https://www.icpsr.umich.edu/web/NACJD/series/7/studies)
+Data Source: [Annual Survey of Jails, 2018](https://www.icpsr.umich.edu/web/NACJD/series/7/studies)
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -19,11 +19,6 @@ library(scales)
 
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r}
 jail <- read_dta("37392-0001-Data.dta")
@@ -204,8 +199,7 @@ jail_svy %>%
   geom_bar(mapping = aes(x = region, weight = poptot, fill = region)) +
   geom_errorbar(mapping = aes(x = region, ymin = ci_low, ymax = ci_up), width = .5) +
   coord_flip() + 
-  scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
-  scale_y_continuous(label = comma) +
+  scale_y_continuous(labels = comma) +
   scale_fill_brewer(palette = "Paired")
   labs(
     title = "Southeast Region of the United States Houses the Most Inmates",
@@ -219,6 +213,3 @@ jail_svy %>%
 
 ## Written Interpretation
 Our fourth and final graph represents the total number of individuals in jails, broken down by region, and we can see that the Southeast of the United States houses the most inmates in their region. The Southeast houses nearly 300,000 individuals which is about twice as many compared to any other region in the United States. Our graph includes our standard errors, which are needed because this is a survey estimate of individuals in jails, not administrative data. This is interesting from a policy persepctive to compare and contrast policing tactics or other reasons that the Southeast has so many individuals in jails compared to the rest of the United States, what is the Southeast doing differently?
-
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
