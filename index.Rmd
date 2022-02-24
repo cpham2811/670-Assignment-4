@@ -206,14 +206,14 @@ jail_svy %>%
   coord_flip() + 
   scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
   scale_y_continuous(label = comma) +
+  scale_fill_brewer(palette = "Paired")
   labs(
     title = "Southeast Region of the United States Houses the Most Inmates",
     subtitle = "Compared to Northeast, Midwest, West, and Southwest",
     caption = "Data from Annual Survey of Jails 2018",
     y ="Total Number of Individuals in Jails",
     x = ""
-  ) +
-  theme_minimal()
+  )
 
 ```
 
